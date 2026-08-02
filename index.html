@@ -27,33 +27,23 @@
     </div>
 
     <script>
-        // Tu Client ID GIS (NO OAuth)
+        // Tu Client ID GIS
         const CLIENT_ID = "839165918275-r1s1cvia9uhp843u6hcic91sntasd1q6.apps.googleusercontent.com";
 
         // Tu WebApp de Apps Script (modo exec)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtVwJq6-AklownE9hx9yV31fi99XPVEihdBCkF58W41Bx-0CRJPznTpkNryHzcaV8/exec";
 
         function manejarRespuestaGoogle(response) {
+            document.getElementById('mensaje').style.color = '#333';
             document.getElementById('mensaje').innerText = 'Validando credenciales...';
 
             const payload = parseJwt(response.credential);
             const email = payload.email;
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            })
-            .then(() => {
-                document.getElementById('mensaje').style.color = 'green';
-                document.getElementById('mensaje').innerText = `Acceso procesado para: ${email}`;
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('mensaje').style.color = 'red';
-                document.getElementById('mensaje').innerText = 'Error al conectar con el servidor.';
-            });
+            // Redirigir directamente a la Web App de Apps Script pasando el correo por parámetro GET.
+            // Esto activará doGet(e) en el servidor, el cual evaluará tu función checkUserAccess 
+            // y renderizará el sistema completo o el mensaje de error prediseñado en esta misma pestaña.
+            window.location.href = `${SCRIPT_URL}?email=${encodeURIComponent(email)}`;
         }
 
         function parseJwt(token) {

@@ -27,13 +27,13 @@
     </div>
 
     <script>
-        // CLIENTE CORRECTO: Google Identity Services (NO OAuth)
-        const CLIENT_ID = "TU_CLIENT_ID_GIS.apps.googleusercontent.com";
+        // Tu Client ID GIS (NO OAuth)
+        const CLIENT_ID = "839165918275-r1s1cvia9uhp843u6hcic91sntasd1q6.apps.googleusercontent.com";
 
-        // URL de tu WebApp de Apps Script
+        // Tu WebApp de Apps Script (modo exec)
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtVwJq6-AklownE9hx9yV31fi99XPVEihdBCkF58W41Bx-0CRJPznTpkNryHzcaV8/exec";
 
-        function handleCredentialResponse(response) {
+        function manejarRespuestaGoogle(response) {
             document.getElementById('mensaje').innerText = 'Validando credenciales...';
 
             const payload = parseJwt(response.credential);
@@ -68,12 +68,15 @@
         window.onload = () => {
             google.accounts.id.initialize({
                 client_id: CLIENT_ID,
-                callback: handleCredentialResponse
+                callback: manejarRespuestaGoogle,
+                context: "signin",
+                ux_mode: "popup",
+                auto_select: true
             });
 
             google.accounts.id.renderButton(
                 document.getElementById("buttonDiv"),
-                { theme: "outline", size: "large", width: "280" }
+                { theme: "outline", size: "large", text: "signin_with", shape: "rectangular" }
             );
 
             google.accounts.id.prompt();

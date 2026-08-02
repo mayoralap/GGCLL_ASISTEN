@@ -1,77 +1,45 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Autorizado</title>
+<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Acceso Autorizado</title><script src="https://accounts.google.com/gsi/client" async defer></script><style>
+body{font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;background:#f4f4f9}
+.card{background:#fff;padding:30px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.1);text-align:center;width:350px;box-sizing:border-box}
+#buttonDiv{display:flex;justify-content:center;width:100%;margin-top:20px}
+#mensaje{margin-top:20px;font-weight:bold}
+</style></head><body>
+<div class="card"><h2>Validación de Acceso</h2><p>Inicia sesión con tu cuenta de Google para verificar tus privilegios.</p><div id="buttonDiv"></div><div id="mensaje"></div></div>
 
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const A="498552950849-4cj5lp97qrbqf63jc914ji96lq744m4t.apps.googleusercontent.com",
+B="https://script.google.com/macros/s/AKfycbw8TaXy51RlQqC1RK0JVXnSk4rQ-Q-6LIXbAZfpO2IE3qeqvGv6yOdDQfBKVVKJ_tQ/exec";
 
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 350px; }
-        #mensaje { margin-top: 20px; font-weight: bold; }
-    </style>
-</head>
-<body>
+function C(r){
+    const m=document.getElementById('mensaje');
+    m.style.color="#333";
+    m.innerText="Validando credenciales...";
+    const p=D(r.credential),e=p.email;
+    window.location.href=B+"?email="+encodeURIComponent(e);
+}
 
-    <div class="card">
-        <h2>Validación de Acceso</h2>
-        <p>Inicia sesión con tu cuenta de Google para verificar tus privilegios.</p>
+function D(t){
+    const b=t.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(atob(b).split('').map(c=>'%'+('0'+c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
 
-        <!-- Botón de Google -->
-        <div id="buttonDiv"></div>
+window.onload=()=>{
 
-        <div id="mensaje"></div>
-    </div>
+    google.accounts.id.initialize({
+        client_id:A,
+        callback:C,
+        context:"signin",
+        ux_mode:"popup",
+        auto_select:true
+    });
 
-    <script>
-        // Tu Client ID GIS
-       const CLIENT_ID = "498552950849-4cj5lp97qrbqf63jc914ji96lq744m4t.apps.googleusercontent.com";
+    google.accounts.id.renderButton(
+        document.getElementById("buttonDiv"),
+        {theme:"outline",size:"large",text:"signin_with",shape:"rectangular",width:"290"}
+    );
 
-        // Tu WebApp de Apps Script (modo exec)
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw8TaXy51RlQqC1RK0JVXnSk4rQ-Q-6LIXbAZfpO2IE3qeqvGv6yOdDQfBKVVKJ_tQ/exec";
+    google.accounts.id.prompt();
+};
+</script>
 
-        function manejarRespuestaGoogle(response) {
-            document.getElementById('mensaje').style.color = '#333';
-            document.getElementById('mensaje').innerText = 'Validando credenciales...';
-
-            const payload = parseJwt(response.credential);
-            const email = payload.email;
-
-            // Redirigir directamente a la Web App de Apps Script pasando el correo por parámetro GET.
-            // Esto activará doGet(e) en el servidor, el cual evaluará tu función checkUserAccess 
-            // y renderizará el sistema completo o el mensaje de error prediseñado en esta misma pestaña.
-            window.location.href = `${SCRIPT_URL}?email=${encodeURIComponent(email)}`;
-        }
-
-        function parseJwt(token) {
-            const base64Url = token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-                '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2)
-            ).join(''));
-            return JSON.parse(jsonPayload);
-        }
-
-        window.onload = () => {
-            google.accounts.id.initialize({
-                client_id: CLIENT_ID,
-                callback: manejarRespuestaGoogle,
-                context: "signin",
-                ux_mode: "popup",
-                auto_select: true
-            });
-
-            google.accounts.id.renderButton(
-                document.getElementById("buttonDiv"),
-                { theme: "outline", size: "large", text: "signin_with", shape: "rectangular" }
-            );
-
-            google.accounts.id.prompt();
-        };
-    </script>
-
-</body>
-</html>
+</body></html>
